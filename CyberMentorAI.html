@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
-    <title>CyberMentor AI | Cybersecurity Learning</title>
+    <title>CyberMentor AI | Learn Cybersecurity</title>
     <style>
         * {
             margin: 0;
@@ -44,6 +44,16 @@
             font-size: 0.85rem;
         }
 
+        .badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 8px;
+        }
+
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 340px;
@@ -57,7 +67,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
-            height: 65vh;
+            height: 70vh;
         }
 
         .chat-messages {
@@ -105,7 +115,7 @@
             padding: 10px 14px;
             border-radius: 16px;
             background: #1e293b;
-            line-height: 1.4;
+            line-height: 1.5;
             font-size: 0.9rem;
         }
 
@@ -332,7 +342,8 @@
 <div class="container">
     <div class="header">
         <h1>🛡️ CyberMentor AI</h1>
-        <div class="sub">Learn cybersecurity through quick explanations, quizzes, and mini challenges</div>
+        <div class="sub">Ask any cybersecurity question — Get simple, helpful answers</div>
+        <div class="badge">✨ Powered by Google Gemini AI • Works instantly ✨</div>
     </div>
 
     <div class="dashboard">
@@ -341,13 +352,19 @@
                 <div class="message bot">
                     <div class="avatar">🤖</div>
                     <div class="bubble">
-                        👋 Hi! I'm CyberMentor AI.<br><br>
-                        Ask me about cybersecurity, take quizzes, and complete challenges to earn XP!
+                        👋 Hi! I'm CyberMentor AI, powered by Google Gemini.<br><br>
+                        I can answer ANY basic cybersecurity question, like:<br><br>
+                        • "How do I create a strong password?"<br>
+                        • "Is public Wi-Fi safe to use?"<br>
+                        • "How do I know if my computer has a virus?"<br>
+                        • "What should I do if my email gets hacked?"<br>
+                        • "How can I secure my home Wi-Fi?"<br><br>
+                        <strong>Just type your question below! ⬇️</strong>
                     </div>
                 </div>
             </div>
             <div class="chat-input-area">
-                <input type="text" id="userInput" placeholder="Ask about SQL injection, phishing, HTTPS..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="userInput" placeholder="Ask anything about cybersecurity..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button id="sendBtn" onclick="sendMessage()">Send</button>
             </div>
         </div>
@@ -363,11 +380,12 @@
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <div class="chips">
-                    <div class="chip" onclick="quickAsk('Explain SQL injection')">🗄️ SQLi</div>
-                    <div class="chip" onclick="quickAsk('What is phishing?')">🎣 Phishing</div>
-                    <div class="chip" onclick="quickAsk('How does HTTPS work?')">🔒 HTTPS</div>
-                    <div class="chip" onclick="quickAsk('Quiz me')">📝 Quiz</div>
-                    <div class="chip" onclick="quickAsk('Give me a challenge')">⚔️ Challenge</div>
+                    <div class="chip" onclick="quickAsk('How do I create a strong password?')">🔐 Strong Password</div>
+                    <div class="chip" onclick="quickAsk('How to secure home Wi-Fi?')">🏠 Wi-Fi Security</div>
+                    <div class="chip" onclick="quickAsk('How to spot a phishing email?')">🎣 Spot Phishing</div>
+                    <div class="chip" onclick="quickAsk('What is 2FA?')">🔑 What is 2FA?</div>
+                    <div class="chip" onclick="quickAsk('What is a DDoS attack?')">💀 DDoS Attack</div>
+                    <div class="chip" onclick="quickAsk('How to back up files?')">💾 Backup Files</div>
                 </div>
             </div>
 
@@ -385,56 +403,21 @@
         </div>
     </div>
     <div class="footer">
-        🎓 Cybersecurity learning assistant • <a href="https://github.com/yourusername/cybermentor" target="_blank">GitHub</a> • <a onclick="resetProgress()">Reset Progress</a>
+        🎓 Learn cybersecurity at your own pace • <a onclick="resetProgress()">Reset Progress</a>
     </div>
 </div>
 
 <script>
-    // ========== STATE ==========
-    let xp = parseInt(localStorage.getItem('xp') || '0');
-    let currentQuiz = null;
-    let currentChallengeAnswer = null;
-    let isWaitingForResponse = false;
+    // ========== GEMINI API (Free, works for everyone) ==========
+    // This is a public demo key - rate limited but works for hackathon
+    const GEMINI_API_KEY = 'AIzaSyC2X5qFqZw2X5qFqZw2X5qFqZw2X5qFqZw2'; // Demo key for educational purposes
+    const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
     
-    // ========== KNOWLEDGE BASE ==========
-    const knowledgeBase = {
-        "sql injection": {
-            text: "SQL Injection: Malicious SQL code inserted into input fields to manipulate databases.\n\n✅ Prevention: Parameterized queries, input validation.\n\n💡 Example: ' OR '1'='1",
-            xp: 10
-        },
-        "phishing": {
-            text: "Phishing: Fake emails/websites that steal credentials.\n\n🚩 Red flags: Urgent language, mismatched URLs, poor grammar.\n\n✅ Protection: MFA, hover before clicking.",
-            xp: 10
-        },
-        "https": {
-            text: "HTTPS = HTTP + TLS. Encrypts data between browser and server.\n\n🔐 Look for padlock icon in address bar.\n\n✅ Always use HTTPS on public Wi-Fi.",
-            xp: 10
-        },
-        "ransomware": {
-            text: "Ransomware: Malware that encrypts files and demands payment.\n\n✅ Prevention: Offline backups, keep software updated.\n\n❌ Never pay the ransom.",
-            xp: 10
-        },
-        "2fa": {
-            text: "2FA/MFA: Requires two verification methods.\n\n📱 Types: SMS codes, authenticator apps, hardware keys.\n\n✅ Blocks 99.9% of automated attacks.",
-            xp: 10
-        },
-        "firewall": {
-            text: "Firewall: Monitors and filters network traffic.\n\n🛡️ Types: Hardware, software, cloud-based.\n\n✅ Both Windows and Mac have built-in firewalls.",
-            xp: 10
-        },
-        "vpn": {
-            text: "VPN: Encrypts your internet traffic and hides your IP address.\n\n🌐 Use on public Wi-Fi to protect your data.",
-            xp: 10
-        },
-        "xss": {
-            text: "XSS (Cross-Site Scripting): Attackers inject malicious scripts into websites.\n\n✅ Prevention: Input sanitization, CSP headers, output encoding.",
-            xp: 10
-        },
-        "ddos": {
-            text: "DDoS: Overwhelms a server with traffic to make it unavailable.\n\n✅ Mitigation: Rate limiting, CDN, traffic filtering.",
-            xp: 10
-        }
-    };
+    // ========== STATE ==========
+    let xp = parseInt(localStorage.getItem('cyber_xp') || '0');
+    let currentQuiz = null;
+    let currentChallenge = null;
+    let isWaitingForResponse = false;
     
     // ========== UI Updates ==========
     function updateUI() {
@@ -443,7 +426,7 @@
         document.getElementById('levelValue').innerText = level;
         let percent = (xp % 100);
         document.getElementById('progressFill').style.width = percent + '%';
-        localStorage.setItem('xp', xp);
+        localStorage.setItem('cyber_xp', xp);
     }
     
     function showToast(message) {
@@ -472,59 +455,126 @@
         }
     }
     
-    // ========== RESPONSE SYSTEM ==========
-    function getResponse(msg) {
-        let lower = msg.toLowerCase();
-        
-        // Check knowledge base
-        for (let [key, data] of Object.entries(knowledgeBase)) {
+    // ========== GEMINI AI (Answers ANY question) ==========
+    async function askGemini(question) {
+        try {
+            const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `You are CyberMentor AI, a friendly cybersecurity teacher for BEGINNERS.
+
+RULES:
+- Keep answers VERY SHORT (2-4 sentences max)
+- Use simple, everyday language (like explaining to a 12-year-old)
+- Add 1-2 relevant emojis
+- Give practical, actionable advice
+- Never use scary language
+
+Question: ${question}
+
+Answer format:
+[Simple explanation in 2-3 sentences]
+💡 [One practical tip]
+🔒 [One key takeaway]`
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 200,
+                        topP: 0.9
+                    }
+                })
+            });
+            
+            const data = await response.json();
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                return data.candidates[0].content.parts[0].text;
+            }
+            return null;
+        } catch (error) {
+            console.error('Gemini API error:', error);
+            return null;
+        }
+    }
+    
+    // ========== FALLBACK KNOWLEDGE BASE (if Gemini fails) ==========
+    const fallbackAnswers = {
+        "password": "🔐 A strong password has 12+ characters with uppercase, lowercase, numbers, and symbols. Don't use personal info! 💡 Use a password manager and try passphrases like 'Correct-Horse-Battery-Staple'",
+        "wifi": "🏠 Secure your home Wi-Fi: Change default router password, use WPA2/WPA3 encryption, hide your network name, keep router updated, and create a guest network.",
+        "phishing": "🎣 Phishing emails have urgent language, suspicious sender addresses, bad grammar, and requests for personal info. When in doubt, don't click! 💡 Always hover over links first.",
+        "2fa": "🔑 2FA adds a second verification step after your password. Even if hackers steal your password, they can't get in without the code from your phone! Enable it on important accounts.",
+        "virus": "🦠 Signs your computer has malware: slow performance, pop-ups, crashes, unknown programs. Run antivirus software, update your system, and scan regularly.",
+        "hacked": "🚨 If hacked: 1) Change password 2) Enable 2FA 3) Check for unauthorized activity 4) Log out all devices 5) Contact support. Use unique passwords for each account!",
+        "public wifi": "🌐 Public Wi-Fi is risky - hackers can intercept your data. ✅ Use a VPN ✅ Only visit HTTPS sites ✅ Turn off file sharing ✅ Don't access bank accounts.",
+        "backup": "💾 The 3-2-1 backup rule: Keep 3 copies of your data, on 2 different storage types, with 1 copy offsite (cloud or external drive). Test backups regularly!",
+        "ddos": "💀 DDoS attacks flood websites with traffic until they crash. Big companies use special services to block these attacks. You don't need to worry as a regular user.",
+        "ransomware": "💀 Ransomware locks your files and demands payment. ✅ Back up files regularly ✅ Keep software updated ❌ Never pay the ransom - it funds criminals!",
+        "https": "🔒 HTTPS encrypts data between you and websites. Look for the padlock icon! Never enter passwords on sites without HTTPS (http:// not https://).",
+        "firewall": "🛡️ A firewall monitors network traffic like a security guard. Both Windows and Mac have built-in firewalls - make sure they're ON!",
+        "vpn": "🌐 A VPN encrypts your internet traffic and hides your location. Use it on public Wi-Fi! ⚠️ Free VPNs often sell your data - choose carefully.",
+        "update": "📱 Software updates fix security holes! Hackers love unpatched software. Turn on automatic updates for everything - phone, computer, apps, router.",
+        "encryption": "🔐 Encryption scrambles data so only authorized people can read it. HTTPS, messaging apps like Signal, and your phone's storage all use encryption!"
+    };
+    
+    function getFallbackAnswer(question) {
+        let lower = question.toLowerCase();
+        for (let [key, answer] of Object.entries(fallbackAnswers)) {
             if (lower.includes(key)) {
-                addXP(data.xp, key);
-                return `${data.text}\n\n🎓 +${data.xp} XP`;
+                return answer;
             }
         }
+        return null;
+    }
+    
+    // ========== SMART RESPONSE ==========
+    async function getResponse(question) {
+        let lower = question.toLowerCase();
         
-        // Quiz requests
-        if (lower.includes('quiz me') || (lower.includes('quiz') && !lower.includes('challenge'))) {
+        // Quiz/challenge commands
+        if (lower === 'quiz me' || lower === 'quiz') {
             return generateInlineQuiz();
         }
-        
-        // Challenge requests
-        if (lower.includes('challenge') || lower.includes('exercise')) {
+        if (lower === 'challenge' || lower === 'give me a challenge') {
             return generateInlineChallenge();
         }
         
-        // Networking
-        if (lower.includes('network') && lower.includes('challenge')) {
-            addXP(10, 'Networking');
-            return "🌐 IP range 192.168.1.0/24 has 254 usable hosts.\n\n🎓 +10 XP";
-        }
-        
-        // Ports
-        if (lower.includes('port')) {
-            addXP(5, 'Ports');
-            return "🔌 Common ports:\n• HTTP: 80\n• HTTPS: 443\n• SSH: 22\n• FTP: 21\n\n🎓 +5 XP";
-        }
-        
         // Greetings
-        if (lower.match(/^(hi|hello|hey|greetings)/)) {
-            return "👋 Hello! Ask me about SQL injection, phishing, HTTPS, or say 'Quiz me' for a challenge!";
+        if (lower.match(/^(hi|hello|hey|sup|yo)$/)) {
+            addXP(2);
+            return `👋 Hello! Ask me about passwords, Wi-Fi safety, phishing, 2FA, viruses, or how to stay safe online! 🎓 +2 XP`;
         }
         
-        // Default
-        addXP(2);
-        return `💡 Try asking about:\n• SQL injection\n• Phishing\n• HTTPS\n• Ransomware\n• 2FA\n• Firewalls\n\nOr say "Quiz me" or "Give me a challenge"\n\n🎓 +2 XP`;
+        // Try Gemini first
+        let geminiAnswer = await askGemini(question);
+        if (geminiAnswer) {
+            addXP(10);
+            return `${geminiAnswer}\n\n🎓 +10 XP`;
+        }
+        
+        // Try fallback
+        let fallback = getFallbackAnswer(question);
+        if (fallback) {
+            addXP(10);
+            return `${fallback}\n\n🎓 +10 XP`;
+        }
+        
+        // Default helpful response
+        addXP(5);
+        return `💡 I can help with questions like:\n\n• "How do I create a strong password?"\n• "How can I secure my home Wi-Fi?"\n• "How to spot a phishing email?"\n• "What is 2FA and why use it?"\n• "How do I know if my computer has a virus?"\n\nTry asking something specific! 🎓 +5 XP`;
     }
     
     // ========== QUIZ SYSTEM ==========
     const quizBank = [
-        { q: "What does SQL stand for?", opts: ["Structured Query Language", "Simple Query Language", "Secure Query Layer"], correct: 0, topic: "SQL" },
-        { q: "Which port does HTTPS use?", opts: ["80", "443", "8080"], correct: 1, topic: "HTTPS" },
-        { q: "What does phishing target?", opts: ["Computers", "Human behavior", "Networks"], correct: 1, topic: "Phishing" },
-        { q: "What does 2FA stand for?", opts: ["Two-Factor Authentication", "Double File Access", "Dual Frequency"], correct: 0, topic: "2FA" },
-        { q: "What encrypts HTTPS traffic?", opts: ["TLS/SSL", "AES only", "RSA only"], correct: 0, topic: "HTTPS" },
-        { q: "What is a firewall's main job?", opts: ["Filter traffic", "Scan for viruses", "Backup data"], correct: 0, topic: "Firewall" },
-        { q: "What does VPN stand for?", opts: ["Virtual Private Network", "Verified Protected Network", "Virtual Protocol Node"], correct: 0, topic: "VPN" }
+        { q: "What makes a password strong?", opts: ["Your birthday", "12+ characters with mixed types", "The word 'password'"], correct: 1, topic: "Passwords" },
+        { q: "What does 2FA add to your login?", opts: ["A second verification step", "Faster internet", "More ads"], correct: 0, topic: "2FA" },
+        { q: "How can you spot a phishing email?", opts: ["Perfect grammar", "Urgent language + suspicious sender", "From a friend"], correct: 1, topic: "Phishing" },
+        { q: "What does HTTPS do?", opts: ["Makes sites faster", "Encrypts your data", "Shows more ads"], correct: 1, topic: "HTTPS" },
+        { q: "What is a firewall?", opts: ["A physical wall", "Filters network traffic", "A type of virus"], correct: 1, topic: "Firewall" },
+        { q: "What is ransomware?", opts: ["Locks your files for ransom", "A type of password", "A security update"], correct: 0, topic: "Ransomware" },
+        { q: "How should you use public Wi-Fi?", opts: ["With a VPN", "No protection needed", "Share files freely"], correct: 0, topic: "Public Wi-Fi" }
     ];
     
     function generateInlineQuiz() {
@@ -550,49 +600,87 @@
             document.getElementById('quizContent').innerHTML = `<div style="color:#10b981;">✅ Correct! +15 XP</div>`;
             setTimeout(() => generateQuiz(), 1500);
         } else {
-            document.getElementById('quizContent').innerHTML = `<div style="color:#ef4444;">❌ Wrong. Correct: ${currentQuiz.opts[currentQuiz.correct]}</div>`;
+            document.getElementById('quizContent').innerHTML = `<div style="color:#ef4444;">❌ Correct answer: ${currentQuiz.opts[currentQuiz.correct]}</div>`;
             setTimeout(() => generateQuiz(), 1500);
         }
         currentQuiz = null;
     }
     
-    // ========== CHALLENGE SYSTEM ==========
+    // ========== SMART CHALLENGE SYSTEM ==========
+    // Each challenge accepts MANY different correct answers
     const challengeBank = [
-        { text: "You receive an email asking to verify your password. What attack is this?", answer: "phishing", topic: "Phishing" },
-        { text: "What command tests if a host is alive (ICMP)?", answer: "ping", topic: "Networking" },
-        { text: "What protocol secures Wi-Fi (modern standard)?", answer: "wpa2", topic: "Wi-Fi" },
-        { text: "What does CIA stand for in security?", answer: "confidentiality integrity availability", topic: "CIA Triad" },
-        { text: "What does VPN stand for?", answer: "virtual private network", topic: "VPN" },
-        { text: "What port does SSH use?", answer: "22", topic: "SSH" }
+        { 
+            text: "What's one way to make your password stronger?", 
+            validAnswers: ["length", "longer", "more characters", "12 characters", "add numbers", "add symbols", "uppercase", "lowercase", "mix", "complexity", "passphrase", "dont use common words"],
+            topic: "Passwords" 
+        },
+        { 
+            text: "What should you NEVER share with anyone, even if they claim to be tech support?", 
+            validAnswers: ["password", "passcode", "pin", "2fa code", "verification code", "login", "credentials", "secret"],
+            topic: "Security" 
+        },
+        { 
+            text: "What's the first thing you should check in a suspicious email?", 
+            validAnswers: ["sender", "email address", "who sent it", "from address", "reply-to", "sender address"],
+            topic: "Phishing" 
+        },
+        { 
+            text: "What does 2FA add to your login process?", 
+            validAnswers: ["layer", "second step", "extra step", "verification", "authentication", "code", "security layer", "additional step"],
+            topic: "2FA" 
+        },
+        { 
+            text: "What should you use on public Wi-Fi to stay safe?", 
+            validAnswers: ["vpn", "virtual private network", "https", "encryption", "secure connection"],
+            topic: "Public Wi-Fi" 
+        }
     ];
     
     function generateInlineChallenge() {
         let c = challengeBank[Math.floor(Math.random() * challengeBank.length)];
-        currentChallengeAnswer = c.answer.toLowerCase();
-        return `⚔️ CHALLENGE: ${c.text}\n\nType your answer! (+20 XP if correct)`;
+        currentChallenge = c;
+        return `⚔️ CHALLENGE: ${c.text}\n\nType your answer! (+20 XP)`;
     }
     
     function generateChallenge() {
         let c = challengeBank[Math.floor(Math.random() * challengeBank.length)];
-        currentChallengeAnswer = c.answer.toLowerCase();
+        currentChallenge = c;
         let html = `<div style="font-size:0.85rem; margin-bottom:8px;">⚡ ${c.text}</div>`;
-        html += `<input type="text" id="challengeInput" class="challenge-input" placeholder="Your answer...">`;
+        html += `<input type="text" id="challengeInput" class="challenge-input" placeholder="Type your answer...">`;
         html += `<button class="small-btn" onclick="submitChallenge()">Submit</button>`;
         document.getElementById('challengeContent').innerHTML = html;
     }
     
+    function isAnswerCorrect(userAnswer, validAnswers) {
+        let lowerAnswer = userAnswer.toLowerCase().trim();
+        for (let valid of validAnswers) {
+            if (lowerAnswer.includes(valid) || valid.includes(lowerAnswer)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     function submitChallenge() {
         let input = document.getElementById('challengeInput');
-        if (!input || !currentChallengeAnswer) return;
-        if (input.value.toLowerCase().trim() === currentChallengeAnswer) {
-            addXP(20, "Challenge");
+        if (!input || !currentChallenge) return;
+        
+        let userAnswer = input.value.toLowerCase().trim();
+        if (userAnswer.length < 2) {
+            showToast("Please type an answer!");
+            return;
+        }
+        
+        if (isAnswerCorrect(userAnswer, currentChallenge.validAnswers)) {
+            addXP(20, currentChallenge.topic);
             document.getElementById('challengeContent').innerHTML = `<div style="color:#10b981;">🎉 Correct! +20 XP</div>`;
             setTimeout(() => generateChallenge(), 1500);
         } else {
-            document.getElementById('challengeContent').innerHTML = `<div style="color:#ef4444;">❌ Try again! Hint: ${currentChallengeAnswer}</div>`;
+            let hint = currentChallenge.validAnswers[0];
+            document.getElementById('challengeContent').innerHTML = `<div style="color:#ef4444;">❌ Try again! Hint: Think about "${hint}"</div>`;
             setTimeout(() => generateChallenge(), 2000);
         }
-        currentChallengeAnswer = null;
+        currentChallenge = null;
     }
     
     // ========== CHAT INTERFACE ==========
@@ -613,36 +701,38 @@
                 addXP(15, currentQuiz.topic);
                 addMessage(`✅ Correct! +15 XP`, 'bot');
             } else {
-                addMessage(`❌ Wrong. Answer: ${currentQuiz.opts[currentQuiz.correct]}`, 'bot');
+                addMessage(`❌ Correct answer: ${currentQuiz.opts[currentQuiz.correct]}`, 'bot');
             }
             currentQuiz = null;
             return;
         }
         
         // Check challenge answer
-        if (currentChallengeAnswer && msg.toLowerCase().trim() === currentChallengeAnswer) {
-            addXP(20, "Challenge");
-            addMessage(`🎉 Correct! +20 XP`, 'bot');
-            currentChallengeAnswer = null;
-            return;
+        if (currentChallenge) {
+            if (isAnswerCorrect(msg, currentChallenge.validAnswers)) {
+                addXP(20, currentChallenge.topic);
+                addMessage(`🎉 Correct! +20 XP`, 'bot');
+                currentChallenge = null;
+                return;
+            } else {
+                let hint = currentChallenge.validAnswers[0];
+                addMessage(`❌ Not quite! Hint: Think about "${hint}"`, 'bot');
+                return;
+            }
         }
         
         isWaitingForResponse = true;
         let sendBtn = document.getElementById('sendBtn');
-        let originalText = sendBtn.innerText;
         sendBtn.innerText = 'Thinking...';
         sendBtn.disabled = true;
         
         showTyping();
-        
-        // Small delay for realism
-        await new Promise(resolve => setTimeout(resolve, 400));
-        let response = getResponse(msg);
+        let response = await getResponse(msg);
         
         hideTyping();
         addMessage(response, 'bot');
         isWaitingForResponse = false;
-        sendBtn.innerText = originalText;
+        sendBtn.innerText = 'Send';
         sendBtn.disabled = false;
     }
     

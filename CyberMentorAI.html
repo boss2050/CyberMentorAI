@@ -1,1 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CyberMentor AI | Google Gemini Cybersecurity Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0c10 0%, #0f1117 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .gemini-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 8px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        .chat-section {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 65vh;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .avatar {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            background: #1e293b;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            padding: 10px 16px;
+            border-radius: 30px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #00d4ff;
+        }
+
+        .chat-input-area input::placeholder {
+            color: #475569;
+        }
+
+        .chat-input-area button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            padding: 0 20px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 90px;
+        }
+
+        .chat-input-area button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            color: #00d4ff;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            background: #1e293b;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-option {
+            background: #1e293b;
+            margin: 6px 0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: #2d3a5e;
+            transform: translateX(3px);
+        }
+
+        .challenge-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            color: white;
+            margin: 8px 0;
+            font-size: 0.8rem;
+        }
+
+        button.small-btn {
+            background: #2d3a5e;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        button.small-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-1px);
+        }
+
+        .chip {
+            background: #1e293b;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background: #3b82f6;
+            transform: translateY(-1px);
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.7rem;
+            color: #475569;
+        }
+
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #00d4ff;
+        }
+
+        .xp-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 800px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .chat-section {
+                height: 55vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🛡️ CyberMentor AI</h1>
+        <div class="sub">Learn cybersecurity through quick explanations, quizzes, and mini challenges</div>
+        <div class="gemini-badge">✨ Powered by Google Gemini AI</div>
+    </div>
+
+    <div class="dashboard">
+        <div class="chat-section">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="avatar">🤖</div>
+                    <div class="bubble">
+                        👋 Hi! I'm CyberMentor AI, powered by Google Gemini.<br><br>
+                        Ask cybersecurity questions, take quizzes, and complete mini challenges.
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Ask about SQL injection, phishing, HTTPS..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="card">
+                <h3>📊 Your Progress</h3>
+                <div class="progress-stats">
+                    <span>XP: <span id="xpValue">0</span></span>
+                    <span>Level: <span id="levelValue">1</span></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="chips">
+                    <div class="chip" onclick="quickAsk('Explain SQL injection')">🗄️ SQLi</div>
+                    <div class="chip" onclick="quickAsk('What is phishing?')">🎣 Phishing</div>
+                    <div class="chip" onclick="quickAsk('How does HTTPS work?')">🔒 HTTPS</div>
+                    <div class="chip" onclick="quickAsk('Quiz me')">📝 Quiz</div>
+                    <div class="chip" onclick="quickAsk('Give me a challenge')">⚔️ Challenge</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📝 Quick Quiz</h3>
+                <button class="small-btn" onclick="generateQuiz()">New Quiz</button>
+                <div id="quizContent" style="margin-top: 10px;"></div>
+            </div>
+
+            <div class="card">
+                <h3>⚔️ Mini Challenge</h3>
+                <button class="small-btn" onclick="generateChallenge()">New Challenge</button>
+                <div id="challengeContent" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        🎓 Cybersecurity learning assistant • <a href="#" onclick="resetProgress()">Reset Progress</a>
+    </div>
+</div>
+
+<script>
+    // ========== GEMINI CONFIGURATION ==========
+    // Get your free API key: https://aistudio.google.com/app/apikey
+    // Replace this with your key for the demo (or keep as-is - user will be prompted)
+    const GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
+    const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+    
+    // Only prompt if no key exists (first-time users)
+    if (!GEMINI_API_KEY && !localStorage.getItem('api_key_prompted')) {
+        localStorage.setItem('api_key_prompted', 'true');
+        const key = prompt('🔑 Enter your free Google Gemini API key (get one at aistudio.google.com):\n\nIt\'s free and takes 30 seconds!');
+        if (key && key.length > 10) {
+            localStorage.setItem('gemini_api_key', key);
+            location.reload();
+        }
+    }
+    
+    // ========== STATE ==========
+    let xp = parseInt(localStorage.getItem('xp') || '0');
+    let currentQuiz = null;
+    let currentChallengeAnswer = null;
+    let isWaitingForResponse = false;
+    
+    // ========== UI Updates ==========
+    function updateUI() {
+        document.getElementById('xpValue').innerText = xp;
+        let level = Math.floor(xp / 100) + 1;
+        document.getElementById('levelValue').innerText = level;
+        let percent = (xp % 100);
+        document.getElementById('progressFill').style.width = percent + '%';
+        localStorage.setItem('xp', xp);
+    }
+    
+    function showToast(message) {
+        let toast = document.createElement('div');
+        toast.className = 'xp-toast';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+    
+    function addXP(amount, topic = null) {
+        xp += amount;
+        updateUI();
+        if (topic) {
+            showToast(`+${amount} XP • ${topic}`);
+        } else {
+            showToast(`+${amount} XP`);
+        }
+    }
+    
+    function resetProgress() {
+        if (confirm('Reset all your progress? XP will go back to 0.')) {
+            xp = 0;
+            updateUI();
+            showToast('Progress reset!');
+        }
+    }
+    
+    // ========== GEMINI AI ==========
+    async function askGemini(question) {
+        const apiKey = localStorage.getItem('gemini_api_key');
+        if (!apiKey) {
+            return null;
+        }
+        
+        try {
+            const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': application/json },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `You are CyberMentor AI, a cybersecurity teacher for beginners. Keep responses VERY short (2-3 sentences max). Use emojis. Be concise and friendly.
+
+Question: ${question}`
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 150,
+                        topP: 0.9
+                    }
+                })
+            });
+            
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                return data.candidates[0].content.parts[0].text;
+            }
+            return null;
+        } catch (error) {
+            console.error('Gemini error:', error);
+            return null;
+        }
+    }
+    
+    // ========== FALLBACK KNOWLEDGE ==========
+    const fallbackKnowledge = {
+        "sql injection": "SQL Injection: Malicious SQL code inserted into input fields to manipulate databases.\n\n✅ Prevention: Parameterized queries, input validation.\n\n💡 Example: ' OR '1'='1",
+        "phishing": "Phishing: Fake emails/websites that steal credentials.\n\n🚩 Red flags: Urgent language, mismatched URLs, poor grammar.\n\n✅ Protection: MFA, hover before clicking.",
+        "https": "HTTPS = HTTP + TLS. Encrypts data between browser and server.\n\n🔐 Look for padlock icon in address bar.\n\n✅ Always use HTTPS on public Wi-Fi.",
+        "ransomware": "Ransomware: Malware that encrypts files and demands payment.\n\n✅ Prevention: Offline backups, keep software updated.\n\n❌ Never pay the ransom.",
+        "2fa": "2FA/MFA: Requires two verification methods.\n\n📱 Types: SMS codes, authenticator apps, hardware keys.\n\n✅ Blocks 99.9% of automated attacks.",
+        "firewall": "Firewall: Monitors and filters network traffic.\n\n🛡️ Types: Hardware, software, cloud-based.\n\n✅ Both Windows and Mac have built-in firewalls.",
+        "vpn": "VPN: Encrypts your internet traffic and hides your IP address.\n\n🌐 Use on public Wi-Fi to protect your data from eavesdroppers."
+    };
+    
+    function getFallbackResponse(msg) {
+        let lower = msg.toLowerCase();
+        for (let [key, text] of Object.entries(fallbackKnowledge)) {
+            if (lower.includes(key)) {
+                addXP(10, key);
+                return `${text}\n\n🎓 +10 XP`;
+            }
+        }
+        return null;
+    }
+    
+    // ========== MAIN RESPONSE ==========
+    async function getResponse(msg) {
+        let fallback = getFallbackResponse(msg);
+        if (fallback) return fallback;
+        
+        if (msg.toLowerCase().includes('quiz me')) {
+            return generateInlineQuiz();
+        }
+        
+        if (msg.toLowerCase().includes('challenge') || msg.toLowerCase().includes('exercise')) {
+            return generateInlineChallenge();
+        }
+        
+        let geminiResponse = await askGemini(msg);
+        if (geminiResponse) {
+            addXP(5);
+            return `${geminiResponse}\n\n✨ +5 XP`;
+        }
+        
+        addXP(2);
+        return `💡 Try asking about:\n• SQL injection\n• Phishing\n• HTTPS\n• Ransomware\n• 2FA\n• Firewalls\n\nOr say "Quiz me" or "Give me a challenge"\n\n🎓 +2 XP`;
+    }
+    
+    // ========== QUIZ SYSTEM ==========
+    const quizBank = [
+        { q: "What does SQL stand for?", opts: ["Structured Query Language", "Simple Query Language", "Secure Query Layer"], correct: 0, topic: "SQL" },
+        { q: "Which port does HTTPS use?", opts: ["80", "443", "8080"], correct: 1, topic: "HTTPS" },
+        { q: "What does phishing target?", opts: ["Computers", "Human behavior", "Networks"], correct: 1, topic: "Phishing" },
+        { q: "What does 2FA stand for?", opts: ["Two-Factor Authentication", "Double File Access", "Dual Frequency"], correct: 0, topic: "2FA" },
+        { q: "What encrypts HTTPS traffic?", opts: ["TLS/SSL", "AES only", "RSA only"], correct: 0, topic: "HTTPS" },
+        { q: "What is a firewall's main job?", opts: ["Filter traffic", "Scan for viruses", "Backup data"], correct: 0, topic: "Firewall" }
+    ];
+    
+    function generateInlineQuiz() {
+        let q = quizBank[Math.floor(Math.random() * quizBank.length)];
+        currentQuiz = q;
+        return `📋 QUIZ: ${q.q}\n\n${q.opts.map((o,i) => `${i+1}. ${o}`).join('\n')}\n\nReply with 1, 2, or 3! (+15 XP if correct)`;
+    }
+    
+    function generateQuiz() {
+        let q = quizBank[Math.floor(Math.random() * quizBank.length)];
+        currentQuiz = q;
+        let html = `<div style="font-size:0.85rem; margin-bottom:8px;">❓ ${q.q}</div>`;
+        q.opts.forEach((opt, idx) => {
+            html += `<div class="quiz-option" onclick="answerQuiz(${idx})">${String.fromCharCode(65+idx)}. ${opt}</div>`;
+        });
+        document.getElementById('quizContent').innerHTML = html;
+    }
+    
+    function answerQuiz(selected) {
+        if (!currentQuiz) return;
+        if (selected === currentQuiz.correct) {
+            addXP(15, currentQuiz.topic);
+            document.getElementById('quizContent').innerHTML = `<div style="color:#10b981;">✅ Correct! +15 XP</div>`;
+            setTimeout(() => generateQuiz(), 1500);
+        } else {
+            document.getElementById('quizContent').innerHTML = `<div style="color:#ef4444;">❌ Wrong. Correct: ${currentQuiz.opts[currentQuiz.correct]}</div>`;
+            setTimeout(() => generateQuiz(), 1500);
+        }
+        currentQuiz = null;
+    }
+    
+    // ========== CHALLENGE SYSTEM ==========
+    const challengeBank = [
+        { text: "You receive an email asking to verify your password. What attack is this?", answer: "phishing", topic: "Phishing" },
+        { text: "What command tests if a host is alive (ICMP)?", answer: "ping", topic: "Networking" },
+        { text: "What protocol secures Wi-Fi (modern standard)?", answer: "wpa2", topic: "Wi-Fi" },
+        { text: "What does CIA stand for in security?", answer: "confidentiality integrity availability", topic: "CIA Triad" },
+        { text: "What does VPN stand for?", answer: "virtual private network", topic: "VPN" }
+    ];
+    
+    function generateInlineChallenge() {
+        let c = challengeBank[Math.floor(Math.random() * challengeBank.length)];
+        currentChallengeAnswer = c.answer.toLowerCase();
+        return `⚔️ CHALLENGE: ${c.text}\n\nType your answer! (+20 XP if correct)`;
+    }
+    
+    function generateChallenge() {
+        let c = challengeBank[Math.floor(Math.random() * challengeBank.length)];
+        currentChallengeAnswer = c.answer.toLowerCase();
+        let html = `<div style="font-size:0.85rem; margin-bottom:8px;">⚡ ${c.text}</div>`;
+        html += `<input type="text" id="challengeInput" class="challenge-input" placeholder="Your answer...">`;
+        html += `<button class="small-btn" onclick="submitChallenge()">Submit</button>`;
+        document.getElementById('challengeContent').innerHTML = html;
+    }
+    
+    function submitChallenge() {
+        let input = document.getElementById('challengeInput');
+        if (!input || !currentChallengeAnswer) return;
+        if (input.value.toLowerCase().trim() === currentChallengeAnswer) {
+            addXP(20, "Challenge");
+            document.getElementById('challengeContent').innerHTML = `<div style="color:#10b981;">🎉 Correct! +20 XP</div>`;
+            setTimeout(() => generateChallenge(), 1500);
+        } else {
+            document.getElementById('challengeContent').innerHTML = `<div style="color:#ef4444;">❌ Try again!</div>`;
+            setTimeout(() => generateChallenge(), 1500);
+        }
+        currentChallengeAnswer = null;
+    }
+    
+    // ========== CHAT INTERFACE ==========
+    async function sendMessage() {
+        if (isWaitingForResponse) return;
+        
+        let input = document.getElementById('userInput');
+        let msg = input.value.trim();
+        if (!msg) return;
+        
+        addMessage(msg, 'user');
+        input.value = '';
+        
+        // Check quiz answer
+        if (currentQuiz && msg.match(/^[1-3]$/)) {
+            let idx = parseInt(msg) - 1;
+            if (idx === currentQuiz.correct) {
+                addXP(15, currentQuiz.topic);
+                addMessage(`✅ Correct! +15 XP`, 'bot');
+            } else {
+                addMessage(`❌ Wrong. Answer: ${currentQuiz.opts[currentQuiz.correct]}`, 'bot');
+            }
+            currentQuiz = null;
+            return;
+        }
+        
+        // Check challenge answer
+        if (currentChallengeAnswer && msg.toLowerCase().trim() === currentChallengeAnswer) {
+            addXP(20, "Challenge");
+            addMessage(`🎉 Correct! +20 XP`, 'bot');
+            currentChallengeAnswer = null;
+            return;
+        }
+        
+        isWaitingForResponse = true;
+        let sendBtn = document.getElementById('sendBtn');
+        let originalText = sendBtn.innerText;
+        sendBtn.innerText = 'Thinking...';
+        sendBtn.disabled = true;
+        
+        showTyping();
+        let response = await getResponse(msg);
+        
+        hideTyping();
+        addMessage(response, 'bot');
+        isWaitingForResponse = false;
+        sendBtn.innerText = originalText;
+        sendBtn.disabled = false;
+    }
+    
+    function addMessage(text, sender) {
+        let container = document.getElementById('chatMessages');
+        let div = document.createElement('div');
+        div.className = `message ${sender}`;
+        div.innerHTML = `
+            <div class="avatar">${sender === 'user' ? '👤' : '🤖'}</div>
+            <div class="bubble">${text.replace(/\n/g, '<br>')}</div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    let typingDiv = null;
+    function showTyping() {
+        let container = document.getElementById('chatMessages');
+        typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+        container.appendChild(typingDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function hideTyping() {
+        if (typingDiv) typingDiv.remove();
+        typingDiv = null;
+    }
+    
+    function quickAsk(msg) {
+        document.getElementById('userInput').value = msg;
+        sendMessage();
+    }
+    
+    // Initialize
+    updateUI();
+    generateQuiz();
+    generateChallenge();
+</script>
+</body>
+</html>

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CyberMentor AI | Google Gemini Cybersecurity Learning</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <title>CyberMentor AI | Cybersecurity Learning</title>
     <style>
         * {
             margin: 0;
@@ -41,16 +42,6 @@
         .sub {
             color: #64748b;
             font-size: 0.85rem;
-        }
-
-        .gemini-badge {
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin-top: 8px;
         }
 
         .dashboard {
@@ -182,7 +173,6 @@
         .chat-input-area button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .sidebar {
@@ -267,7 +257,6 @@
 
         button.small-btn:hover {
             background: #3b82f6;
-            transform: translateY(-1px);
         }
 
         .chip {
@@ -282,7 +271,6 @@
 
         .chip:hover {
             background: #3b82f6;
-            transform: translateY(-1px);
         }
 
         .chips {
@@ -304,6 +292,7 @@
         .footer a {
             color: #64748b;
             text-decoration: none;
+            cursor: pointer;
         }
 
         .footer a:hover {
@@ -344,7 +333,6 @@
     <div class="header">
         <h1>🛡️ CyberMentor AI</h1>
         <div class="sub">Learn cybersecurity through quick explanations, quizzes, and mini challenges</div>
-        <div class="gemini-badge">✨ Powered by Google Gemini AI</div>
     </div>
 
     <div class="dashboard">
@@ -353,8 +341,8 @@
                 <div class="message bot">
                     <div class="avatar">🤖</div>
                     <div class="bubble">
-                        👋 Hi! I'm CyberMentor AI, powered by Google Gemini.<br><br>
-                        Ask cybersecurity questions, take quizzes, and complete mini challenges.
+                        👋 Hi! I'm CyberMentor AI.<br><br>
+                        Ask me about cybersecurity, take quizzes, and complete challenges to earn XP!
                     </div>
                 </div>
             </div>
@@ -397,32 +385,56 @@
         </div>
     </div>
     <div class="footer">
-        🎓 Cybersecurity learning assistant • <a href="#" onclick="resetProgress()">Reset Progress</a>
+        🎓 Cybersecurity learning assistant • <a href="https://github.com/yourusername/cybermentor" target="_blank">GitHub</a> • <a onclick="resetProgress()">Reset Progress</a>
     </div>
 </div>
 
 <script>
-    // ========== GEMINI CONFIGURATION ==========
-    // Get your free API key: https://aistudio.google.com/app/apikey
-    // Replace this with your key for the demo (or keep as-is - user will be prompted)
-    const GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
-    const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
-    
-    // Only prompt if no key exists (first-time users)
-    if (!GEMINI_API_KEY && !localStorage.getItem('api_key_prompted')) {
-        localStorage.setItem('api_key_prompted', 'true');
-        const key = prompt('🔑 Enter your free Google Gemini API key (get one at aistudio.google.com):\n\nIt\'s free and takes 30 seconds!');
-        if (key && key.length > 10) {
-            localStorage.setItem('gemini_api_key', key);
-            location.reload();
-        }
-    }
-    
     // ========== STATE ==========
     let xp = parseInt(localStorage.getItem('xp') || '0');
     let currentQuiz = null;
     let currentChallengeAnswer = null;
     let isWaitingForResponse = false;
+    
+    // ========== KNOWLEDGE BASE ==========
+    const knowledgeBase = {
+        "sql injection": {
+            text: "SQL Injection: Malicious SQL code inserted into input fields to manipulate databases.\n\n✅ Prevention: Parameterized queries, input validation.\n\n💡 Example: ' OR '1'='1",
+            xp: 10
+        },
+        "phishing": {
+            text: "Phishing: Fake emails/websites that steal credentials.\n\n🚩 Red flags: Urgent language, mismatched URLs, poor grammar.\n\n✅ Protection: MFA, hover before clicking.",
+            xp: 10
+        },
+        "https": {
+            text: "HTTPS = HTTP + TLS. Encrypts data between browser and server.\n\n🔐 Look for padlock icon in address bar.\n\n✅ Always use HTTPS on public Wi-Fi.",
+            xp: 10
+        },
+        "ransomware": {
+            text: "Ransomware: Malware that encrypts files and demands payment.\n\n✅ Prevention: Offline backups, keep software updated.\n\n❌ Never pay the ransom.",
+            xp: 10
+        },
+        "2fa": {
+            text: "2FA/MFA: Requires two verification methods.\n\n📱 Types: SMS codes, authenticator apps, hardware keys.\n\n✅ Blocks 99.9% of automated attacks.",
+            xp: 10
+        },
+        "firewall": {
+            text: "Firewall: Monitors and filters network traffic.\n\n🛡️ Types: Hardware, software, cloud-based.\n\n✅ Both Windows and Mac have built-in firewalls.",
+            xp: 10
+        },
+        "vpn": {
+            text: "VPN: Encrypts your internet traffic and hides your IP address.\n\n🌐 Use on public Wi-Fi to protect your data.",
+            xp: 10
+        },
+        "xss": {
+            text: "XSS (Cross-Site Scripting): Attackers inject malicious scripts into websites.\n\n✅ Prevention: Input sanitization, CSP headers, output encoding.",
+            xp: 10
+        },
+        "ddos": {
+            text: "DDoS: Overwhelms a server with traffic to make it unavailable.\n\n✅ Mitigation: Rate limiting, CDN, traffic filtering.",
+            xp: 10
+        }
+    };
     
     // ========== UI Updates ==========
     function updateUI() {
@@ -460,85 +472,46 @@
         }
     }
     
-    // ========== GEMINI AI ==========
-    async function askGemini(question) {
-        const apiKey = localStorage.getItem('gemini_api_key');
-        if (!apiKey) {
-            return null;
-        }
-        
-        try {
-            const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': application/json },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `You are CyberMentor AI, a cybersecurity teacher for beginners. Keep responses VERY short (2-3 sentences max). Use emojis. Be concise and friendly.
-
-Question: ${question}`
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 150,
-                        topP: 0.9
-                    }
-                })
-            });
-            
-            const data = await response.json();
-            if (data.candidates && data.candidates[0].content.parts[0].text) {
-                return data.candidates[0].content.parts[0].text;
-            }
-            return null;
-        } catch (error) {
-            console.error('Gemini error:', error);
-            return null;
-        }
-    }
-    
-    // ========== FALLBACK KNOWLEDGE ==========
-    const fallbackKnowledge = {
-        "sql injection": "SQL Injection: Malicious SQL code inserted into input fields to manipulate databases.\n\n✅ Prevention: Parameterized queries, input validation.\n\n💡 Example: ' OR '1'='1",
-        "phishing": "Phishing: Fake emails/websites that steal credentials.\n\n🚩 Red flags: Urgent language, mismatched URLs, poor grammar.\n\n✅ Protection: MFA, hover before clicking.",
-        "https": "HTTPS = HTTP + TLS. Encrypts data between browser and server.\n\n🔐 Look for padlock icon in address bar.\n\n✅ Always use HTTPS on public Wi-Fi.",
-        "ransomware": "Ransomware: Malware that encrypts files and demands payment.\n\n✅ Prevention: Offline backups, keep software updated.\n\n❌ Never pay the ransom.",
-        "2fa": "2FA/MFA: Requires two verification methods.\n\n📱 Types: SMS codes, authenticator apps, hardware keys.\n\n✅ Blocks 99.9% of automated attacks.",
-        "firewall": "Firewall: Monitors and filters network traffic.\n\n🛡️ Types: Hardware, software, cloud-based.\n\n✅ Both Windows and Mac have built-in firewalls.",
-        "vpn": "VPN: Encrypts your internet traffic and hides your IP address.\n\n🌐 Use on public Wi-Fi to protect your data from eavesdroppers."
-    };
-    
-    function getFallbackResponse(msg) {
+    // ========== RESPONSE SYSTEM ==========
+    function getResponse(msg) {
         let lower = msg.toLowerCase();
-        for (let [key, text] of Object.entries(fallbackKnowledge)) {
+        
+        // Check knowledge base
+        for (let [key, data] of Object.entries(knowledgeBase)) {
             if (lower.includes(key)) {
-                addXP(10, key);
-                return `${text}\n\n🎓 +10 XP`;
+                addXP(data.xp, key);
+                return `${data.text}\n\n🎓 +${data.xp} XP`;
             }
         }
-        return null;
-    }
-    
-    // ========== MAIN RESPONSE ==========
-    async function getResponse(msg) {
-        let fallback = getFallbackResponse(msg);
-        if (fallback) return fallback;
         
-        if (msg.toLowerCase().includes('quiz me')) {
+        // Quiz requests
+        if (lower.includes('quiz me') || (lower.includes('quiz') && !lower.includes('challenge'))) {
             return generateInlineQuiz();
         }
         
-        if (msg.toLowerCase().includes('challenge') || msg.toLowerCase().includes('exercise')) {
+        // Challenge requests
+        if (lower.includes('challenge') || lower.includes('exercise')) {
             return generateInlineChallenge();
         }
         
-        let geminiResponse = await askGemini(msg);
-        if (geminiResponse) {
-            addXP(5);
-            return `${geminiResponse}\n\n✨ +5 XP`;
+        // Networking
+        if (lower.includes('network') && lower.includes('challenge')) {
+            addXP(10, 'Networking');
+            return "🌐 IP range 192.168.1.0/24 has 254 usable hosts.\n\n🎓 +10 XP";
         }
         
+        // Ports
+        if (lower.includes('port')) {
+            addXP(5, 'Ports');
+            return "🔌 Common ports:\n• HTTP: 80\n• HTTPS: 443\n• SSH: 22\n• FTP: 21\n\n🎓 +5 XP";
+        }
+        
+        // Greetings
+        if (lower.match(/^(hi|hello|hey|greetings)/)) {
+            return "👋 Hello! Ask me about SQL injection, phishing, HTTPS, or say 'Quiz me' for a challenge!";
+        }
+        
+        // Default
         addXP(2);
         return `💡 Try asking about:\n• SQL injection\n• Phishing\n• HTTPS\n• Ransomware\n• 2FA\n• Firewalls\n\nOr say "Quiz me" or "Give me a challenge"\n\n🎓 +2 XP`;
     }
@@ -550,7 +523,8 @@ Question: ${question}`
         { q: "What does phishing target?", opts: ["Computers", "Human behavior", "Networks"], correct: 1, topic: "Phishing" },
         { q: "What does 2FA stand for?", opts: ["Two-Factor Authentication", "Double File Access", "Dual Frequency"], correct: 0, topic: "2FA" },
         { q: "What encrypts HTTPS traffic?", opts: ["TLS/SSL", "AES only", "RSA only"], correct: 0, topic: "HTTPS" },
-        { q: "What is a firewall's main job?", opts: ["Filter traffic", "Scan for viruses", "Backup data"], correct: 0, topic: "Firewall" }
+        { q: "What is a firewall's main job?", opts: ["Filter traffic", "Scan for viruses", "Backup data"], correct: 0, topic: "Firewall" },
+        { q: "What does VPN stand for?", opts: ["Virtual Private Network", "Verified Protected Network", "Virtual Protocol Node"], correct: 0, topic: "VPN" }
     ];
     
     function generateInlineQuiz() {
@@ -588,7 +562,8 @@ Question: ${question}`
         { text: "What command tests if a host is alive (ICMP)?", answer: "ping", topic: "Networking" },
         { text: "What protocol secures Wi-Fi (modern standard)?", answer: "wpa2", topic: "Wi-Fi" },
         { text: "What does CIA stand for in security?", answer: "confidentiality integrity availability", topic: "CIA Triad" },
-        { text: "What does VPN stand for?", answer: "virtual private network", topic: "VPN" }
+        { text: "What does VPN stand for?", answer: "virtual private network", topic: "VPN" },
+        { text: "What port does SSH use?", answer: "22", topic: "SSH" }
     ];
     
     function generateInlineChallenge() {
@@ -614,8 +589,8 @@ Question: ${question}`
             document.getElementById('challengeContent').innerHTML = `<div style="color:#10b981;">🎉 Correct! +20 XP</div>`;
             setTimeout(() => generateChallenge(), 1500);
         } else {
-            document.getElementById('challengeContent').innerHTML = `<div style="color:#ef4444;">❌ Try again!</div>`;
-            setTimeout(() => generateChallenge(), 1500);
+            document.getElementById('challengeContent').innerHTML = `<div style="color:#ef4444;">❌ Try again! Hint: ${currentChallengeAnswer}</div>`;
+            setTimeout(() => generateChallenge(), 2000);
         }
         currentChallengeAnswer = null;
     }
@@ -659,7 +634,10 @@ Question: ${question}`
         sendBtn.disabled = true;
         
         showTyping();
-        let response = await getResponse(msg);
+        
+        // Small delay for realism
+        await new Promise(resolve => setTimeout(resolve, 400));
+        let response = getResponse(msg);
         
         hideTyping();
         addMessage(response, 'bot');

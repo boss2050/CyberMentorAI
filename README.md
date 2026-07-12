@@ -64,27 +64,10 @@ CyberMentor AI is designed strictly for educational and defensive cybersecurity 
 Add your Netlify deployment link here:
 
 ```bash
-https://your-project.netlify.app
+[https://your-project.netlify.app](https://cybermasterai.netlify.app)
 ```
 
-## 📂 Installation
 
-Clone the repository:
-
-```bash
-git clone https://github.com/your-username/cybermentor-ai.git
-```
-
-Open the project folder:
-
-```bash
-cd cybermentor-ai
-```
-
-Run locally by opening:
-
-```bash
-index.html
 ```
 
 ## 🔮 Future Improvements
@@ -98,7 +81,7 @@ index.html
 
 ## 👨‍💻 Author
 
-Created by a student developer passionate about AI, cybersecurity, and accessible technology education.
+Anant Saxena
 
 ## 📜 License
 
